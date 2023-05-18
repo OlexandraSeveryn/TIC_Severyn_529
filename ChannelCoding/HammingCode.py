@@ -36,7 +36,7 @@ def decode(encoded, fix_errors=True):
 
 def getCharsToBin(chars):
     assert not len(chars) * 8 % CHUNK_LENGTH, 'Довжина кодових даних повинна бути кратною довжині блоку кодування'
-    return ''.join([bin(ord(c))[2:].zfill(8) for c in chars])
+    return ''.join([bin(ord(c))[2:].zfill(16) for c in chars])
 
 
 def getChunkIterator(text_bin, chunk_size=CHUNK_LENGTH):
@@ -124,11 +124,10 @@ def getDiffIndexList(value_bin1, value_bin2):
 
 
 def main():
-    open("result_hamming.txt", "w", encoding="UTF-8")
+    open("results_hamming.txt", "w", encoding="UTF-8")
     with open("sequence.txt", "r") as file:
         original_sequences = ast.literal_eval(file.read())
         original_sequences = [seq.strip("[]").strip("'") for seq in original_sequences]
-        file.close()
     for sequence in original_sequences:
         source = sequence[:10]
         source_bin, encoded = encode(source)
@@ -137,28 +136,28 @@ def main():
         diff_index_list = getDiffIndexList(encoded, encoded_with_error)
         decoded_with_error = decode(encoded_with_error, fix_errors=False)
         decoded_without_error = decode(encoded_with_error)
-        result = open("result_hamming.txt", "a", encoding="UTF-8")
-        result.write("|" * 25 + '\n')
-        result.write(f"Оригінальна послідовність: " + source + "\n")
-        result.write(f"Оригінальна послідовність в бітах: {source_bin}\n")
-        result.write(f"Розмір оригінальної послідовності: {str(len(source_bin))}\n")
-        result.write(f"Довжина блоку кодування: {CHUNK_LENGTH}\n")
-        result.write(f"Позиція контрольних біт: {CHECK_BITS}\n")
-        result.write(f"Відносна надмірність коду: {len(CHECK_BITS) / CHUNK_LENGTH}\n")
-        result.write("__________Кодування__________" + "\n")
-        result.write(f"Закодовані дані: {encoded}\n")
-        result.write(f"Розмір закодованих даних: {len(encoded)}\n")
-        result.write("_________Декодування_________" + "\n")
-        result.write(f"Декодовані дані: {decoded}\n")
-        result.write(f"Розмір декодованих даних: {len(decoded) * 16}\n")
-        result.write("______Внесення помилки_______" + "\n")
-        result.write(f"Закодовані дані з помилками: {encoded_with_error}\n")
-        result.write(f"Кількість помилок: {len(diff_index_list)}\n")
-        result.write(f"Індекси помилок: {diff_index_list}\n")
-        result.write(f"Декодовані дані без виправлення помилки: {decoded_with_error}\n")
-        result.write(f"Декодовані дані з виправленням помилки: {decoded_without_error}\n")
-        result.write("|" * 25 + "\n")
-        result.close()
+
+        with open("results_hamming.txt", "a", encoding="utf-8") as file:
+            file.write("|" * 25 + "\n")
+            file.write(f"Оригінальна послідовність: " + source + "\n")
+            file.write(f"Оригінальна послідовність в бітах: {source_bin}\n")
+            file.write(f"Розмір оригінальної послідовності: {str(len(source_bin))}\n")
+            file.write(f"Довжина блоку кодування: {CHUNK_LENGTH}\n")
+            file.write(f"Позиція контрольних біт: {CHECK_BITS}\n")
+            file.write(f"Відносна надмірність коду: {len(CHECK_BITS) / CHUNK_LENGTH}\n")
+            file.write("__________Кодування__________" + "\n")
+            file.write(f"Закодовані дані: {encoded}\n")
+            file.write(f"Розмір закодованих даних: {len(encoded)}\n")
+            file.write("_________Декодування_________" + "\n")
+            file.write(f"Декодовані дані: {decoded}\n")
+            file.write(f"Розмір декодованих даних: {len(decoded) * 16}\n")
+            file.write("______Внесення помилки_______" + "\n")
+            file.write(f"Закодовані дані з помилками: {encoded_with_error}\n")
+            file.write(f"Кількість помилок: {len(diff_index_list)}\n")
+            file.write(f"Індекси помилок: {diff_index_list}\n")
+            file.write(f"Декодовані дані без виправлення помилки: {decoded_with_error}\n")
+            file.write(f"Декодовані дані з виправленням помилки: {decoded_without_error}\n")
+            file.write("|" * 25 + "\n")
 
 
 if __name__ == '__main__':
